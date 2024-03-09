@@ -1,0 +1,91 @@
+//Database Creation
+ 
+create database movie;
+
+
+//Table Creation
+
+create table actor(act_id integer(10) primary key , act_name varchar(20) , act_gender varchar(5));
+
+create table director(dir_id integer(10) primary key , dir_name varchar(20) , dir_phone varchar(12));
+
+create table movies(mov_id integer(10) primary key , mov_title varchar(20) , mov_year varchar(10) , mov_lang varchar(10) , dir_id integer(10) , foreign key (dir_id) references director (dir_id) on delete cascade);
+
+create table movie_cast(act_id integer(10) , mov_id integer(10) , role varchar(20) , primary key(act_id , mov_id) , foreign key(act_id) references actor(act_id) on delete cascade , foreign key(mov_id) references movies(mov_id) on delete cascade);
+
+create table rating(mov_id integer(10) primary key , rev_stars integer(10) , foreign key(mov_id) references movies(mov_id) on delete cascade );
+
+
+//Table Insertion
+
+insert into actor values(1,'Madhuri Dixit','F'),(2,'Aamir Khan','M'),(3,'Juhi Chawla','F'),(4,'Sridevi','F');
+
+insert into director values(100,'Subhash Kapoor','9563400156'),(101,'Alan Taylor','9563400157'),(102,'Santosh Anaddram','9563400158'),(103,'Imtiaz Ali','9563400159'),(104,'Hitchcock','9563400191'),(105,'Steven Spielberg','9563400192');
+
+insert into movies values(501,'Jab Harry Met Sajal','2017','Hindi',104),(502,'Rajakumara','2017','Kannada',103),(503,'Jolly llb 2','2013','Hindi',100),(504,'Terminator Genesys','2015','English',102),(505,'Jaws','1975','English',105);
+
+insert into movie_cast values(1,501,'Heroine'),(1,502,'Heroine'),(1,502,'Heroine'),(4,504,'Guest'),(4,501,'Hero');
+
+insert into rating values(501,4),(503,2),(502,5),(503,5),(504,4),(505,3);
+
+//Queries
+
+1. select mov_title from movies m , director d where m.dir_id = d.dir_id and d.dir_name = 'Hitchcock';
+
++---------------------+
+| mov_title           |
++---------------------+
+| Jab Harry Met Sajal |
++---------------------+
+
+2. select mov_title from movies m , movie_cast mv where m.mov_id = mv.mov_id and act_id in
+    -> (select act_id from movie_cast group by act_id having count(act_id)>1)
+    -> group by mov_title having count(*)>1;
+
++---------------------+
+| mov_title           |
++---------------------+
+| Jab Harry Met Sajal |
++---------------------+
+
+3. select act_name , mov_title , mov_year from actor a join movie_cast mc on a.act_id = mc.act_id inner join movies m on mc.mov_id = m.mov_id where mov_year not between 2000 and 2015;
+
++---------------+---------------------+----------+
+| act_name      | mov_title           | mov_year |
++---------------+---------------------+----------+
+| Madhuri Dixit | Jab Harry Met Sajal | 2017     |
+| Sridevi       | Jab Harry Met Sajal | 2017     |
+| Madhuri Dixit | Rajakumara          | 2017     |
++---------------+---------------------+----------+
+
+4. select mov_title , max(rev_stars) from movies m , rating r where m.mov_id = r.mov_id group by mov_title having max(rev_stars) order by mov_title;
+
++---------------------+----------------+
+| mov_title           | max(rev_stars) |
++---------------------+----------------+
+| Jab Harry Met Sajal |              4 |
+| Jaws                |              3 |
+| Jolly llb 2         |              2 |
+| Rajakumara          |              5 |
+| Terminator Genesys  |              4 |
++---------------------+----------------+
+
+5. update rating r , movies m , director d set rev_stars = 5 where r.mov_id = m.mov_id and m.dir_id = d.dir_id and dir_name = 'Steven Speilberg';
+
+   select * from rating;
+
++--------+-----------+
+| mov_id | rev_stars |
++--------+-----------+
+|    501 |         4 |
+|    502 |         5 |
+|    503 |         2 |
+|    504 |         4 |
+|    505 |         3 |
++--------+-----------+
+
+
+
+
+
+
