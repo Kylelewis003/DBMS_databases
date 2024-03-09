@@ -32,6 +32,7 @@ insert into movie_cast values(1,501,'Heroine'),(1,502,'Heroine'),(1,502,'Heroine
 
 insert into rating values(501,4),(503,2),(502,5),(503,5),(504,4),(505,3);
 
+
 //Queries
 
 1. select mov_title from movies m , director d where m.dir_id = d.dir_id and d.dir_name = 'Hitchcock';
