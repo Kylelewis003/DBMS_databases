@@ -83,7 +83,7 @@ insert into iamarks values('4AD13CS061','10CS81','CSE8C',14,15,15,0),('4AD13CS06
 |    16 | 10CS83  |
 +-------+---------+
 
-4.  update iamarks set finalia = greatest(test1+test2,test2+test2,test3+test1)/2;
+4.  update iamarks set finalia = greatest(test1+test2,test2+test3,test3+test1)/2;
     
     select * from iamarks;
 
