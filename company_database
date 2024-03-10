@@ -1,0 +1,114 @@
+//Database Creation
+
+create database company;
+
+//Table Creation
+
+create table department(dno varchar(20) primary key , dname varchar(20) , mgrssn varchar(20) ,mgrstartdate date);
+
+create table employee(ssn varchar(20) primary key , fname varchar(20) , lname varchar(20) , 
+                    address varchar(20) , sex varchar(1) , salary integer(10), 
+                    superssn varchar(20), dno varchar(20) , foreign key (superssn) references employee(ssn) , 
+                    foreign key(dno) references department (dno));
+
+alter table department add foreign key(mgrssn) references employee (ssn);
+
+create table dlocation(dno varchar(20) , dloc varchar(20) , primary key(dno , dloc) , 
+                    foreign key (dno) references department(dno));
+
+create table project(pno integer(10) primary key , pname varchar(20) , plocation varchar(20) , 
+                    dno varchar(20) , foreign key(dno) references department(dno));
+
+create table works_on(hours integer(5) , ssn varchar(20) primary key , pno integer(20) , 
+                    foreign key(ssn) references employee(ssn) , 
+                    foreign key(pno) references project(pno));
+
+//Table Insertion
+
+insert into employee values('ATMECSE01','JOHN','SCOTT','BANGALORE','M',450000,NULL,NULL),
+                        ('ATMECSE02','JAMES','SMITH','BANGALORE','M',550000,NULL,NULL),
+                        ('ATMECSE03','EDWARD','SCOTT','MYSURU','M',600000,NULL,NULL),
+                        ('ATMECSE04','NEHA','SN','BANGALORE','F',350000,NULL,NULL),
+                        ('ATMECSE05','AHANA','K','BANGALORE','F',700000,NULL,NULL);
+
+insert into department values('1','ACCOUNTS','ATMECSE02','2001-09-08'),
+                            ('2','HR','ATMECSE01','2016-07-16'),
+                            ('3','ECE','ATMECSE03','2001-10-03'),
+                            ('4','ISE','ATMECSE04','2002-01-24'),
+                            ('5','CSE','ATMECSE01','2004-11-07');
+
+
+update employee set superssn = "ATMECSE03" , dno = "5" where ssn = "ATMECSE01";
+update employee set superssn = "ATMECSE01" , dno = "4" where ssn = "ATMECSE02";
+update employee set superssn = "ATMECSE02" , dno = "5" where ssn = "ATMECSE03";
+update employee set superssn = "ATMECSE01" , dno = "2" where ssn = "ATMECSE04";
+update employee set superssn = "ATMECSE03" , dno = "4" where ssn = "ATMECSE05";
+
+insert into dlocation values('1','BANGALORE'),('2','BANGALORE'),
+                            ('3','BANGALORE'),('4','MANGALORE'),
+                            ('5','MANGALORE');
+
+insert into project values(100,'IOT','BANGALORE','5'),
+                        (101,'CLOUD','BANGALORE','5'),
+                        (102,'BIGDATA','BANGALORE','5'),
+                        (103,'SENSORS','BANGALORE','3'),
+                        (104,'FULLSTACK','BANGALORE','1');
+                
+insert into works_on values(5,'ATMECSE01',100),
+                        (9,'ATMECSE04',102),
+                        (4,'ATMECSE05',104),
+                        (6,'ATMECSE02',102),
+                        (5,'ATMECSE03',101);
+
+//Queries
+
+1.  select distinct p.pno from project p , department d , employee e  where d.mgrssn = e.ssn and e.lname = 'SCOTT'
+    -> union
+    -> select distinct p1.pno from project p1 , works_on w , employee e1 where e1.ssn = w.ssn and e1.lname = 'SCOTT';
+
++-----+
+| pno |
++-----+
+| 104 |
+| 103 |
+| 100 |
+| 101 |
+| 102 |
++-----+
+
+
+2.  select e.fname , e.lname , 1.1*e.salary as new_salary from employee e , works_on w , project p  where e.ssn = w.ssn and w.pno = p.pno and p.pname = "IOT"; 
+
++-------+-------+------------+
+| fname | lname | new_salary |
++-------+-------+------------+
+| JOHN  | SCOTT |   495000.0 |
++-------+-------+------------+
+
+3.  select sum(e.salary) , max(e.salary) , min(e.salary) , avg(e.salary) from employee e , department d where e.dno = d.dno and d.dname = 'ACCOUNTS';
+
++---------------+---------------+---------------+---------------+
+| sum(e.salary) | max(e.salary) | min(e.salary) | avg(e.salary) |
++---------------+---------------+---------------+---------------+
+|        450000 |        450000 |        450000 |   450000.0000 |
++---------------+---------------+---------------+---------------+
+
+4.  select e.fname , e.lname from employee e where not exists
+    -> (select pno from project where dno = 5 and pno in
+    -> (select pno from works_on w where e.ssn = w.ssn));
+
++-------+-------+
+| fname | lname |
++-------+-------+
+| AHANA | K     |
++-------+-------+
+
+5.  select d.dno , count(*) from department d , employee e where d.dno = e.dno and e.salary>600000 and d.dno in
+    -> (select e1.dno from employee e1 group by e1.dno having count(*)>1) group by d.dno;
+
++-----+----------+
+| dno | count(*) |
++-----+----------+
+| 4   |        1 |
++-----+----------+
+
