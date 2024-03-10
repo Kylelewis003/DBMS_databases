@@ -91,7 +91,7 @@ insert into iamarks values('4AD13CS061','10CS81','CSE8C',14,15,15,0),('4AD13CS06
 | usn        | subcode | ssid  | test1 | test2 | test3 | finalia |
 +------------+---------+-------+-------+-------+-------+---------+
 | 4AD13CS061 | 10CS71  | CSE8C |    15 |    14 |    18 |      17 |
-| 4AD13CS061 | 10CS72  | CSE8C |    16 |    17 |    18 |      17 |
+| 4AD13CS061 | 10CS72  | CSE8C |    16 |    17 |    18 |      18 |
 | 4AD13CS061 | 10CS81  | CSE7C |    18 |    13 |    15 |      17 |
 | 4AD13CS061 | 10CS81  | CSE8C |    14 |    15 |    15 |      15 |
 | 4AD13CS061 | 10CS82  | CSE8C |    16 |    17 |    13 |      17 |
