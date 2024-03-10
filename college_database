@@ -1,0 +1,118 @@
+//Database Creation
+
+create database college;
+
+//Table Creation
+
+create table student(usn varchar(10) primary key, sname varchar(10) , address varchar(20) ,
+                    phone varchar(12) , gender varchar(3));
+
+create table semsec(ssid varchar(10) primary key , sem integer(5) , sec integer(5));
+
+create table class(usn varchar(10) primary key , ssid varchar(10) , 
+                    foreign key(usn) references student(usn) , foreign key(ssid) references semsec (ssid));
+
+create table subject (subcode varchar(10) primary key , title varchar(10) , sem integer(5) , credits integer(5));
+
+create table iamarks (usn varchar(10) , subcode varchar(10) , ssid varchar(10) , test1 integer(5) , 
+                    test2 integer(5) ,   test3 integer(5) , finalia integer(5),
+    -> primary key(usn , subcode , ssid ),
+    -> foreign key (usn) references student(usn),
+    -> foreign key (subcode) references subject(subcode),
+    -> foreign key (ssid) references semsec(ssid));
+
+//Table Insertion
+
+insert into student values('4AD13CS061','AKSHAY','BELAGAVI','8877881122','M'),
+                        ('4AD13CS062','SANDHYA','BENGALURU','8877881133','F'),
+                        ('4AD13CS063','TEEESHA','BENGALURU','8877881111','F'),
+                        ('4AD13CS064','SUPRIYA','MANGALURU','8877881166','F'),
+                        ('4AD13CS065','ABHAY','BENGALURU','8877881122','M'),
+                        ('4AD13CS066','BHASKAR','BENGALURU','8877881122','M');
+
+insert into semsec values('CSE8A',8,'A'),('CSE8B',8,'B'),('CSE8C',8,'C'),('CSE7A',7,'A'),('CSE7B',7,'B'),('CSE7C',7,'C');
+
+insert into class values('4AD13CS061','CSE8A'),('4AD13CS062','CSE8A'),('4AD13CS063','CSE7B'),('4AD13CS064','CSE7A'),
+                        ('4AD13CS065','CSE7B'),('4AD13CS066','CSE7A');
+
+insert into subject values('10CS81','DFG',8,4),('10CS82','GHR',8,4),('10CS83','PCW',8,2),('10CS71','MCE',7,4),
+                        ('10CS72','DAA',7,4),('10CS73','OS',7,3);
+
+insert into iamarks values('4AD13CS061','10CS81','CSE8C',14,15,15,0),('4AD13CS061','10CS72','CSE8C',16,17,18,0),
+                        ('4AD13CS061','10CS71','CSE8C',15,14,18,0),('4AD13CS061','10CS81','CSE7C',18,13,15,0),
+                        ('4AD13CS061','10CS83','CSE8C',16,14,19,0),('4AD13CS061','10CS82','CSE8C',16,17,13,0);
+
+//Queries
+
+1.  select s.* , ss.sem , ss.sec from student s , semsec ss , class c 
+    where s.usn = c.usn and ss.ssid = c.ssid and ss.sem = 8 and ss.sec = 'A';
+
++------------+---------+-----------+------------+--------+------+------+
+| usn        | sname   | address   | phone      | gender | sem  | sec  |
++------------+---------+-----------+------------+--------+------+------+
+| 4AD13CS061 | AKSHAY  | BELAGAVI  | 8877881122 | M      |    8 | A    |
+| 4AD13CS062 | SANDHYA | BENGALURU | 8877881133 | F      |    8 | A    |
++------------+---------+-----------+------------+--------+------+------+
+
+2.  select ss.sem , ss.sec , s.gender , count(s.gender) as count from student s , semsec ss , class c 
+    where s.usn = c.usn and ss.ssid = c.ssid group by ss.sem , ss.sec , s.gender order by gender;
+
++------+------+--------+-------+
+| sem  | sec  | gender | count |
++------+------+--------+-------+
+|    8 | A    | F      |     1 |
+|    7 | B    | F      |     1 |
+|    7 | A    | F      |     1 |
+|    8 | A    | M      |     1 |
+|    7 | B    | M      |     1 |
+|    7 | A    | M      |     1 |
++------+------+--------+-------+
+
+3.  create view vw as select test1,subcode from iamarks where usn = '4AD13CS061';
+     
+    select * from vw;
+
++-------+---------+
+| test1 | subcode |
++-------+---------+
+|    15 | 10CS71  |
+|    16 | 10CS72  |
+|    18 | 10CS81  |
+|    14 | 10CS81  |
+|    16 | 10CS82  |
+|    16 | 10CS83  |
++-------+---------+
+
+4.  update iamarks set finalia = greatest(test1+test2,test2+test2,test3+test1)/2;
+    
+    select * from iamarks;
+
++------------+---------+-------+-------+-------+-------+---------+
+| usn        | subcode | ssid  | test1 | test2 | test3 | finalia |
++------------+---------+-------+-------+-------+-------+---------+
+| 4AD13CS061 | 10CS71  | CSE8C |    15 |    14 |    18 |      17 |
+| 4AD13CS061 | 10CS72  | CSE8C |    16 |    17 |    18 |      17 |
+| 4AD13CS061 | 10CS81  | CSE7C |    18 |    13 |    15 |      17 |
+| 4AD13CS061 | 10CS81  | CSE8C |    14 |    15 |    15 |      15 |
+| 4AD13CS061 | 10CS82  | CSE8C |    16 |    17 |    13 |      17 |
+| 4AD13CS061 | 10CS83  | CSE8C |    16 |    14 |    19 |      18 |
++------------+---------+-------+-------+-------+-------+---------+
+
+5.  select s.usn , s.sname , s.address , s.phone , s.gender , 
+    (case when ia.finalia between 17 and 20 then 'OUTSTANDING' when ia.finalia between 12 and 16 then 'AVERAGE' else 'WEAK' end) 
+    as cat from student s , semsec ss , iamarks ia , subject sub 
+    where s.usn = ia.usn and ss.ssid = ia.ssid and sub.subcode=ia.subcode and sub.sem = 8;
+
++------------+--------+----------+------------+--------+-------------+
+| usn        | sname  | address  | phone      | gender | cat         |
++------------+--------+----------+------------+--------+-------------+
+| 4AD13CS061 | AKSHAY | BELAGAVI | 8877881122 | M      | OUTSTANDING |
+| 4AD13CS061 | AKSHAY | BELAGAVI | 8877881122 | M      | AVERAGE     |
+| 4AD13CS061 | AKSHAY | BELAGAVI | 8877881122 | M      | OUTSTANDING |
+| 4AD13CS061 | AKSHAY | BELAGAVI | 8877881122 | M      | OUTSTANDING |
++------------+--------+----------+------------+--------+-------------+
+
+
+
+
+
