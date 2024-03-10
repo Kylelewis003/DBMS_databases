@@ -38,7 +38,7 @@ insert into department values('1','ACCOUNTS','ATMECSE02','2001-09-08'),
                             ('5','CSE','ATMECSE01','2004-11-07');
 
 
-update employee set superssn = "ATMECSE03" , dno = "5" where ssn = "ATMECSE01";
+update employee set superssn = "ATMECSE03" , dno = "1" where ssn = "ATMECSE01";
 update employee set superssn = "ATMECSE01" , dno = "4" where ssn = "ATMECSE02";
 update employee set superssn = "ATMECSE02" , dno = "5" where ssn = "ATMECSE03";
 update employee set superssn = "ATMECSE01" , dno = "2" where ssn = "ATMECSE04";
