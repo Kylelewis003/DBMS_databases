@@ -53,7 +53,7 @@ insert into rating values(501,4),(503,2),(502,5),(503,5),(504,4),(505,3);
 | Jab Harry Met Sajal |
 +---------------------+
 
-3. select act_name , mov_title , mov_year from actor a join movie_cast mc on a.act_id = mc.act_id inner join movies m on mc.mov_id = m.mov_id where mov_year not between 2000 and 2015;
+3. select act_name , mov_title , mov_year from actor a join movie_cast mc on a.act_id = mc.act_id join movies m on mc.mov_id = m.mov_id where mov_year not between 2000 and 2015;
 
 +---------------+---------------------+----------+
 | act_name      | mov_title           | mov_year |
@@ -63,7 +63,7 @@ insert into rating values(501,4),(503,2),(502,5),(503,5),(504,4),(505,3);
 | Madhuri Dixit | Rajakumara          | 2017     |
 +---------------+---------------------+----------+
 
-4. select mov_title , max(rev_stars) from movies m , rating r where m.mov_id = r.mov_id group by mov_title having max(rev_stars) order by mov_title;
+4. select mov_title , max(rev_stars) from movies m , rating r where m.mov_id = r.mov_id group by mov_title having max(rev_stars)>0 order by mov_title;
 
 +---------------------+----------------+
 | mov_title           | max(rev_stars) |
