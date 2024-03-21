@@ -1,0 +1,106 @@
+//Database Creation
+
+create database library;
+
+//Table Creation
+
+create table publisher(name varchar(20) primary key , address varchar(20) , phone varchar(12));
+
+create table book(book_id integer(10) primary key , title varchar(20), publisher_name varchar(20) , pub_year date , 
+foreign key(publisher_name) references publisher(name) on delete cascade);
+
+create table book_authors(book_id integer(10) , author_name varchar(20) , primary key(book_id , author_name) , 
+foreign key (book_id) references book (book_id) on delete cascade);
+
+create table library_programme(prog_id integer(10) primary key , prog_name varchar(20) , address varchar(20));
+
+create table book_copies(book_id integer(10) , prog_id integer(10) , no_of_copies integer(10) , 
+primary key(book_id , prog_id) , foreign key(book_id ) references book(book_id) on delete cascade , 
+foreign key(prog_id) references library_programme(prog_id) on delete cascade);
+
+create table book_lending(book_id integer(10) , prog_id integer(10) , card_no integer(10) , date_out date  , due_date date , 
+primary key(book_id , prog_id , card_no), foreign key(book_id) references book(book_id) on delete cascade , 
+foreign key(prog_id) references library_programme(prog_id) on delete cascade);
+
+//Table Insertion
+
+insert into publisher values('MCGRAW-HILL','BANGALORE','9853839175'),('PEARSON','NEW DELHI','9853839176'),
+('PRENTICE HALL','HYEDRABAD','9853839179'),('WILEY','CHENNAI','9853839171'),('MIT','BANGALORE','9853839172');
+
+insert into book values(1,'DBMS','MCGRAW-HILL','2016-05-12'),(2,'ADBMS','MCGRAW-HILL','2017-11-20'),
+(3,'CD','PEARSON','2017-09-01'),(4,'ALGOS','MIT','2017-03-18'),(5,'OS','PEARSON','2016-01-09');
+
+insert into book_authors values(1,'NAVATHE'),(2,'NAVATHE'),(3,'ULLMAN'),(4,'CHARLES'),(5,'GALVIN');
+
+insert into library_programme values(10,'VIJAYHAGAR','MYSURU'),(11,'VUDHYANAGAR','HUBLI'),
+(12,'KUVEMPUNAGAR','MYSURU'),(13,'RAJAJINAGAR','BANGALORE'),(14,'MANIPAL','UDUPI');
+
+insert into book_copies values(1,10,10),(1,11,5),(2,12,2),(2,13,5),(3,14,7);
+
+insert into book_lending values(1,10,101,'2017-01-01','2017-06-01'),(3,14,101,'2017-01-11','2017-03-11'),
+(2,13,101,'2017-03-21','2017-04-21'),(4,11,101,'2017-03-15','2017-07-15'),(1,11,104,'2017-04-12','2017-05-12');
+
+//Queries
+
+1. select b.book_id , b.title , b.publisher_name , a.author_name , c.no_of_copies , l.prog_id from book b , 
+   book_authors a , book_copies c , library_programme l where b.book_id = a.book_id and b.book_id = c.book_id and l.prog_id = c.prog_id;
+
++---------+-------+----------------+-------------+--------------+---------+
+| book_id | title | publisher_name | author_name | no_of_copies | prog_id |
++---------+-------+----------------+-------------+--------------+---------+
+|       1 | DBMS  | MCGRAW-HILL    | NAVATHE     |           10 |      10 |
+|       1 | DBMS  | MCGRAW-HILL    | NAVATHE     |            5 |      11 |
+|       2 | ADBMS | MCGRAW-HILL    | NAVATHE     |            2 |      12 |
+|       2 | ADBMS | MCGRAW-HILL    | NAVATHE     |            5 |      13 |
+|       3 | CD    | PEARSON        | ULLMAN      |            7 |      14 |
++---------+-------+----------------+-------------+--------------+---------+
+
+2. select card_no from book_lending where date_out between '2017-01-01' and '2017-07-01' group by card_no having count(*)>3;
+
++---------+
+| card_no |
++---------+
+|     101 |
++---------+
+
+3. delete from book where book_id = 3;
+   
+   select * from book;
+
++---------+-------+----------------+------------+
+| book_id | title | publisher_name | pub_year   |
++---------+-------+----------------+------------+
+|       1 | DBMS  | MCGRAW-HILL    | 2016-05-12 |
+|       2 | ADBMS | MCGRAW-HILL    | 2017-11-20 |
+|       4 | ALGOS | MIT            | 2017-03-18 |
+|       5 | OS    | PEARSON        | 2016-01-09 |
++---------+-------+----------------+------------+
+
+4. create view vw as select pub_year from book;
+    
+   select * from vw;
+
++------------+
+| pub_year   |
++------------+
+| 2016-05-12 |
+| 2017-11-20 |
+| 2017-03-18 |
+| 2016-01-09 |
++------------+
+
+5. create view vw2 as select b.book_id , b.title , c.no_of_copies from book b , book_copies c , 
+   library_programme l where b.book_id = c.book_id and c.prog_id = l.prog_id;
+
+   select * from vw2;
+
++---------+-------+--------------+
+| book_id | title | no_of_copies |
++---------+-------+--------------+
+|       1 | DBMS  |           10 |
+|       1 | DBMS  |            5 |
+|       2 | ADBMS |            2 |
+|       2 | ADBMS |            5 |
++---------+-------+--------------+
+
+
